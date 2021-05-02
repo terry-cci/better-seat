@@ -1,0 +1,65 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  display: grid;
+
+  min-width: 100vw;
+  min-height: 100vh;
+
+  text-align: center;
+  font-family: -apple-system, BlinkMacSystemFont, "微軟正黑體",
+    "Microsoft JhengHei", "微軟雅黑體", "Microsoft YaHei", "Segoe UI", Roboto,
+    Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+
+  background: #333;
+  color: #111;
+}
+
+main {
+  place-self: center;
+
+  min-width: 550px;
+  min-height: 360px;
+
+  background: #eee;
+  border-radius: 0.5rem;
+  padding: 0.5rem;
+  box-shadow: 0 0.5rem 2rem #000;
+
+  display: grid;
+  grid-template-columns: repeat(2, 1fr) 0.5rem repeat(2, 1fr) 0.5rem repeat(
+      2,
+      1fr
+    );
+  grid-template-rows: repeat(6, 1fr);
+  gap: 0.4rem;
+}
+
+.seat {
+  background: #fff;
+  padding: 0.1em;
+  box-shadow: 0 0.15rem 0.07rem #ccc;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.seat .zh-name {
+  font-size: 1em;
+}
+.seat .info {
+  font-size: 0.5em;
+  color: #888;
+}
+
+.seat .stud-id::before {
+  content: "(";
+}
+
+.seat .stud-id::after {
+  content: ")";
+}
