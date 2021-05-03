@@ -40,7 +40,8 @@ main {
 
 .seat {
   background: #fff;
-  padding: 0.1em;
+  font-size: 1rem;
+  padding: 0.4em;
   box-shadow: 0 0.15rem 0.07rem #ccc;
 
   display: flex;
