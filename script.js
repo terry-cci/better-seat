@@ -29,12 +29,12 @@ function reset() {
     { name: { zh: "孫嘉豪", en: "Billy" }, id: 12 },
     { name: { zh: "張心瑜", en: "Wing" }, id: 13 },
     { name: { zh: "張智謙", en: "William" }, id: 14 },
-    { name: { zh: "張鎮揚", en: "Terry" }, id: 15 },
+    { name: { zh: "張鎭揚", en: "Terry" }, id: 15 },
     { name: { zh: "梁僑丹", en: "Joan" }, id: 16 },
     { name: { zh: "陳卓恒", en: "Sam" }, id: 17 },
     { name: { zh: "陳涌興", en: "Manson" }, id: 18 },
     { name: { zh: "陳棉棉", en: "Icy" }, id: 19 },
-    { name: { zh: "陳靜妍", en: "Mary" }, id: 20 },
+    { name: { zh: "陳靜姸", en: "Mary" }, id: 20 },
     { name: { zh: "馮雅詩", en: "Rebecca" }, id: 21 },
     { name: { zh: "黃志昊", en: "Jay" }, id: 22 },
     { name: { zh: "黃志軒", en: "Jackson" }, id: 23 },
@@ -112,14 +112,14 @@ function draw() {
 
     ctx.font =
       sh / 3 +
-      "px -apple-system, BlinkMacSystemFont, '微軟正黑體', 'Microsoft JhengHei', '微軟雅黑體', 'Microsoft YaHei', 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif";
+      "px -apple-system, BlinkMacSystemFont, '맑은 고딕', 'Malgun Gothic', '微軟正黑體', 'Microsoft JhengHei', '微軟雅黑體', 'Microsoft YaHei', 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif";
     ctx.fillStyle = "#111";
     ctx.fillText(student.name.zh, 0, 0);
 
     ctx.translate(0, sh / 3);
     ctx.font =
       sh / 6 +
-      "px -apple-system, BlinkMacSystemFont, '微軟正黑體', 'Microsoft JhengHei', '微軟雅黑體', 'Microsoft YaHei', 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif";
+      "px -apple-system, BlinkMacSystemFont, '맑은 고딕', 'Malgun Gothic', '微軟正黑體', 'Microsoft JhengHei', '微軟雅黑體', 'Microsoft YaHei', 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif";
     ctx.fillStyle = "#888";
     ctx.fillText(student.name.en + " (" + student.id + ")", 0, 0);
     ctx.restore();
@@ -153,5 +153,5 @@ function lucky() {
   setTimeout(() => {
     document.querySelector("#reset-cat").classList.remove("slide");
     document.querySelector("#reset-btn").disabled = false;
-  }, 600);
+  }, 1000);
 }

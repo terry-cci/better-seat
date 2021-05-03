@@ -14,9 +14,10 @@ body {
   min-height: 100vh;
 
   text-align: center;
-  font-family: -apple-system, BlinkMacSystemFont, "微軟正黑體",
-    "Microsoft JhengHei", "微軟雅黑體", "Microsoft YaHei", "Segoe UI", Roboto,
-    Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "맑은 고딕", "Malgun Gothic",
+    "微軟正黑體", "Microsoft JhengHei", "微軟雅黑體", "Microsoft YaHei",
+    "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue",
+    sans-serif;
 
   background: #333;
   color: #111;
@@ -58,7 +59,7 @@ body {
   left: -100vw;
 }
 #reset-cat.slide {
-  animation: 0.6s linear slide-by forwards;
+  animation: 1s linear slide-by forwards;
 }
 
 @keyframes slide-by {
