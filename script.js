@@ -60,9 +60,18 @@ let offset = 0;
 
 for (let i = 0; i < $seats.length; i++) {
   const $seat = $seats[i];
-  const x = (i + 1) % 6;
-  $seat.style.gridColumn = `${x + (x - 1) / 2}`;
+  const x = i % 6;
+  $seat.style.gridColumn = `${x + 1 + Math.floor(x / 2)}`;
+
+  $seat.innerHTML = `
+      <span class="zh-name"></span>
+      <span class="info">
+        <span class="en-name"></span>
+        <span class="stud-id"></span>
+      </span>
+    `;
 }
+
 function render() {
   const shuffled = students.slice(offset).concat(students.slice(0, offset));
 
@@ -77,13 +86,9 @@ function render() {
   for (let i = 0; i < $seats.length; i++) {
     const $seat = $seats[i];
     const student = shuffled[i];
-    $seat.innerHTML = `
-      <span class="zh-name">${student.name.zh}</span>
-      <span class="info">
-        <span class="en-name">${student.name.en}</span>
-        <span class="stud-id">${student.id}</span>
-      </span>
-    `;
+    $seat.querySelector(".zh-name").innerText = student.name.zh;
+    $seat.querySelector(".en-name").innerText = student.name.en;
+    $seat.querySelector(".stud-id").innerText = student.id;
   }
   offset = (offset + 1) % students.length;
 }
