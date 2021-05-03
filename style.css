@@ -22,49 +22,11 @@ body {
   color: #111;
 }
 
-main {
+#canvas {
   place-self: center;
 
-  min-width: 550px;
-  min-height: 360px;
-
-  background: #eee;
+  width: 550px;
+  height: 360px;
   border-radius: 0.5rem;
-  padding: 0.5rem;
   box-shadow: 0 0.5rem 2rem #000;
-
-  display: grid;
-  grid-template-columns: repeat(2, 1fr) 0.5rem repeat(2, 1fr) 0.5rem repeat(
-      2,
-      1fr
-    );
-  grid-template-rows: repeat(6, 1fr);
-  gap: 0.4rem;
-}
-
-.seat {
-  background: #fff;
-  font-size: 1rem;
-  padding: 0.4em;
-  box-shadow: 0 0.15rem 0.07rem #ccc;
-
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
-
-.seat .zh-name {
-  font-size: 1em;
-}
-.seat .info {
-  font-size: 0.5em;
-  color: #888;
-}
-
-.seat .stud-id::before {
-  content: "(";
-}
-
-.seat .stud-id::after {
-  content: ")";
 }

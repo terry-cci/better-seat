@@ -55,24 +55,27 @@ while (STUDENT_INFO.length) {
   STUDENT_INFO.splice(i, 1);
 }
 
-const $seats = document.querySelector("main").children;
+const $canvas = document.querySelector("#canvas");
+const ctx = $canvas.getContext("2d");
+
+$canvas.width = 1100;
+$canvas.height = 720;
+
 let offset = 0;
 
-for (let i = 0; i < $seats.length; i++) {
-  const $seat = $seats[i];
-  const x = i % 6;
-  $seat.style.gridColumn = `${x + 1 + Math.floor(x / 2)}`;
+function draw() {
+  const { width: w, height: h } = $canvas;
+  const gap = 0.01 * w;
+  const pad = 2 * gap;
+  const bigGap = 1.5 * gap;
+  const sw = (w - gap * 5 - bigGap * 2 - pad * 2) / 6; // seat width
+  const sh = (h - gap * 5 - pad * 2) / 6; // seat height
 
-  $seat.innerHTML = `
-      <span class="zh-name"></span>
-      <span class="info">
-        <span class="en-name"></span>
-        <span class="stud-id"></span>
-      </span>
-    `;
-}
+  ctx.save();
+  ctx.fillStyle = "#eee";
+  ctx.fillRect(0, 0, w, h);
+  ctx.translate(pad, pad);
 
-function render() {
   const shuffled = students.slice(offset).concat(students.slice(0, offset));
 
   RESTRICTED_STUDENT.forEach((student) => {
@@ -83,15 +86,45 @@ function render() {
     shuffled[j] = k;
   });
 
-  for (let i = 0; i < $seats.length; i++) {
-    const $seat = $seats[i];
-    const student = shuffled[i];
-    $seat.querySelector(".zh-name").innerText = student.name.zh;
-    $seat.querySelector(".en-name").innerText = student.name.en;
-    $seat.querySelector(".stud-id").innerText = student.id;
-  }
-  offset = (offset + 1) % students.length;
+  shuffled.forEach((student, idx) => {
+    const x = idx % 6;
+    const y = Math.floor(idx / 6);
+
+    ctx.save();
+    ctx.translate(x * (sw + gap) + Math.floor(x / 2) * bigGap, y * (sh + gap));
+
+    ctx.save();
+    ctx.shadowColor = "#bbb";
+    ctx.shadowBlur = 4;
+    ctx.fillStyle = "#fff";
+    ctx.fillRect(0, 0, sw, sh);
+    ctx.restore();
+
+    ctx.save();
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.translate(sw / 2, sh * (2 / 5));
+
+    ctx.font =
+      sh / 3 +
+      "px -apple-system, BlinkMacSystemFont, '微軟正黑體', 'Microsoft JhengHei', '微軟雅黑體', 'Microsoft YaHei', 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif";
+    ctx.fillStyle = "#111";
+    ctx.fillText(student.name.zh, 0, 0);
+
+    ctx.translate(0, sh / 3);
+    ctx.font =
+      sh / 6 +
+      "px -apple-system, BlinkMacSystemFont, '微軟正黑體', 'Microsoft JhengHei', '微軟雅黑體', 'Microsoft YaHei', 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif";
+    ctx.fillStyle = "#888";
+    ctx.fillText(student.name.en + " (" + student.id + ")", 0, 0);
+    ctx.restore();
+
+    ctx.restore();
+  });
+
+  ctx.restore();
+  offset = ++offset % shuffled.length;
 }
 
-setInterval(render, 1000 / 15);
-render();
+setInterval(draw, 1000 / 20);
+draw();
