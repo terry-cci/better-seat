@@ -1,3 +1,5 @@
+Math.seedrandom(new Date().toISOString());
+
 const RESTRICTED_STUDENT = [
   {
     id: 28,
@@ -68,7 +70,7 @@ $canvas.height = 720;
 
 let offset = 0;
 
-function draw() {
+function draw(adjust) {
   const { width: w, height: h } = $canvas;
   const gap = 0.01 * w;
   const pad = 2 * gap;
@@ -90,6 +92,8 @@ function draw() {
     shuffled[i] = shuffled[j];
     shuffled[j] = k;
   });
+
+  if (adjust) adjust(shuffled);
 
   shuffled.forEach((student, idx) => {
     const x = idx % 6;
@@ -133,15 +137,79 @@ function draw() {
 
 reset();
 
-setInterval(draw, 1000 / 20);
+const FPS = 20;
+let timer = setInterval(draw, 1000 / FPS);
+
 draw();
 
+function happy() {
+  draw((shuffled) => {
+    const t = shuffled.findIndex((s) => s.id === 15);
+    const s = shuffled.findIndex((s) => s.id === 33);
+    const d = Math.random();
+    const b = t % 2;
+    const r = Math.floor(t / 6);
+    const c = t % 6;
+    let p = [];
+    if (d >= 0.95) {
+      p.push(b ? -1 : 1);
+    } else if (d >= 0.875) {
+      if (r > 0) p.push(-6);
+      if (r < 5) p.push(6);
+    } else if (d >= 0.75) {
+      if (r > 0) p.push(-6 + (b ? -1 : 1));
+      if (r < 5) p.push(6 + (b ? -1 : 1));
+    } else if (d >= 0.6125) {
+      if (c > 1 && c < 5) {
+        if (r > 0) p.push(-6 + (b ? 1 : -1));
+        p.push(b ? 1 : -1);
+        if (r < 5) p.push(6 + (b ? 1 : -1));
+      }
+    }
+
+    const pick = () => {
+      p = p.filter((pos) => {
+        const i = (t + pos) % shuffled.length;
+        return !RESTRICTED_STUDENT.find((s) => s.id === shuffled[i].id);
+      });
+
+      if (p.length) {
+        const i =
+          (t + p[Math.floor(Math.random() * p.length)]) % shuffled.length;
+        const k = shuffled[i];
+        shuffled[i] = shuffled[s];
+        shuffled[s] = k;
+      }
+    };
+
+    if (p.length) {
+      pick();
+    } else {
+      for (let i = -2; i <= 2; i++) {
+        for (let j = -2; j <= 2; j++) {
+          if (c + i < 0 || c + i >= 6) continue;
+          if (r + j < 0 || r + j >= 6) continue;
+          if (!(Math.abs(i) === 2 || Math.abs(j) === 2)) continue;
+          p.push(6 * j + i);
+        }
+      }
+      pick();
+    }
+  });
+}
+
 function snapshot() {
+  clearInterval(timer);
+
+  happy();
+
   const imgLink = document.createElement("a");
   imgLink.download =
     "better_seat." + new Date().toISOString().substr(0, 10) + ".png";
   imgLink.href = $canvas.toDataURL();
   imgLink.click();
+
+  timer = setInterval(draw, 1000 / FPS);
 }
 
 function lucky() {
