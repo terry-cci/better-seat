@@ -1,4 +1,4 @@
-Math.seedrandom(new Date().toISOString());
+const rand = new Math.seedrandom(new Date().toISOString());
 
 const RESTRICTED_STUDENT = [
   {
@@ -56,7 +56,7 @@ function reset() {
   ];
 
   while (STUDENT_INFO.length) {
-    const i = Math.floor(Math.random() * STUDENT_INFO.length);
+    const i = Math.floor(rand() * STUDENT_INFO.length);
     students.push(STUDENT_INFO[i]);
     STUDENT_INFO.splice(i, 1);
   }
@@ -87,7 +87,7 @@ function draw(adjust) {
 
   RESTRICTED_STUDENT.forEach((student) => {
     const i = shuffled.findIndex((s) => s.id === student.id);
-    const j = student.seats[Math.floor(Math.random() * student.seats.length)];
+    const j = student.seats[Math.floor(rand() * student.seats.length)];
     const k = shuffled[i];
     shuffled[i] = shuffled[j];
     shuffled[j] = k;
@@ -146,20 +146,20 @@ function happy() {
   draw((shuffled) => {
     const t = shuffled.findIndex((s) => s.id === 15);
     const s = shuffled.findIndex((s) => s.id === 33);
-    const d = Math.random();
+    const d = rand();
     const b = t % 2;
     const r = Math.floor(t / 6);
     const c = t % 6;
     let p = [];
-    if (d >= 0.95) {
+    if (d >= 0.6) {
       p.push(b ? -1 : 1);
-    } else if (d >= 0.875) {
+    } else if (d >= 0.45) {
       if (r > 0) p.push(-6);
       if (r < 5) p.push(6);
-    } else if (d >= 0.75) {
+    } else if (d >= 0.3) {
       if (r > 0) p.push(-6 + (b ? -1 : 1));
       if (r < 5) p.push(6 + (b ? -1 : 1));
-    } else if (d >= 0.6125) {
+    } else if (d >= 0) {
       if (c > 1 && c < 5) {
         if (r > 0) p.push(-6 + (b ? 1 : -1));
         p.push(b ? 1 : -1);
@@ -174,8 +174,7 @@ function happy() {
       });
 
       if (p.length) {
-        const i =
-          (t + p[Math.floor(Math.random() * p.length)]) % shuffled.length;
+        const i = (t + p[Math.floor(rand() * p.length)]) % shuffled.length;
         const k = shuffled[i];
         shuffled[i] = shuffled[s];
         shuffled[s] = k;
