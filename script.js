@@ -1,6 +1,17 @@
-const rand = new Math.seedrandom(new Date().toISOString());
+const rand = new Math.seedrandom(Date.now());
 
 const RESTRICTED_STUDENT = [
+  {
+    id: 15,
+    seats: [
+      1, 2, 3, 4, 7, 8, 9, 10, 13, 14, 15, 16, 19, 20, 21, 22, 25, 26, 27, 28,
+      31, 32, 33, 34,
+    ],
+  },
+  {
+    id: 16,
+    seats: [24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35],
+  },
   {
     id: 28,
     seats: [35],
@@ -8,6 +19,13 @@ const RESTRICTED_STUDENT = [
   {
     id: 30,
     seats: [31, 32, 33, 34],
+  },
+  {
+    id: 33,
+    seats: [
+      7, 8, 9, 10, 13, 14, 15, 16, 19, 20, 21, 22, 25, 26, 27, 28, 31, 32, 33,
+      34,
+    ],
   },
 ];
 
@@ -144,56 +162,90 @@ draw();
 
 function happy() {
   draw((shuffled) => {
-    const t = shuffled.findIndex((s) => s.id === 15);
-    const s = shuffled.findIndex((s) => s.id === 33);
-    const d = rand();
-    const b = t % 2;
-    const r = Math.floor(t / 6);
-    const c = t % 6;
-    let p = [];
-    if (d >= 0.6) {
-      p.push(b ? -1 : 1);
-    } else if (d >= 0.45) {
-      if (r > 0) p.push(-6);
-      if (r < 5) p.push(6);
-    } else if (d >= 0.3) {
-      if (r > 0) p.push(-6 + (b ? -1 : 1));
-      if (r < 5) p.push(6 + (b ? -1 : 1));
-    } else if (d >= 0) {
-      if (c > 1 && c < 5) {
-        if (r > 0) p.push(-6 + (b ? 1 : -1));
-        p.push(b ? 1 : -1);
-        if (r < 5) p.push(6 + (b ? 1 : -1));
-      }
-    }
+    const rcParser = (id) => ({
+      id,
+      b: id % 2,
+      r: Math.floor(id / 6),
+      c: id % 6,
+    });
 
-    const pick = () => {
-      p = p.filter((pos) => {
-        const i = (t + pos) % shuffled.length;
-        return !RESTRICTED_STUDENT.find((s) => s.id === shuffled[i].id);
-      });
+    const dist = (a, b) => Math.max(Math.abs(a.r - b.r), Math.abs(a.c - b.c));
 
-      if (p.length) {
-        const i = (t + p[Math.floor(rand() * p.length)]) % shuffled.length;
-        const k = shuffled[i];
-        shuffled[i] = shuffled[s];
-        shuffled[s] = k;
-      }
+    const swap = (a, b) => {
+      const k = shuffled[a];
+      shuffled[a] = shuffled[b];
+      shuffled[b] = k;
     };
 
-    if (p.length) {
-      pick();
-    } else {
-      for (let i = -2; i <= 2; i++) {
-        for (let j = -2; j <= 2; j++) {
-          if (c + i < 0 || c + i >= 6) continue;
-          if (r + j < 0 || r + j >= 6) continue;
-          if (!(Math.abs(i) === 2 || Math.abs(j) === 2)) continue;
-          p.push(6 * j + i);
+    (() => {
+      const t = shuffled.findIndex((s) => s.id === 15);
+      const s = shuffled.findIndex((s) => s.id === 33);
+      const d = rand();
+      const { b, r, c } = rcParser(s);
+      let p = [];
+      if (d >= 0.99) {
+        p.push(b ? -1 : 1);
+      } else if (d >= 0.94) {
+        if (r > 0) p.push(-6);
+        if (r < 5) p.push(6);
+      } else if (d >= 0.84) {
+        if (r > 0) p.push(-6 + (b ? -1 : 1));
+        if (r < 5) p.push(6 + (b ? -1 : 1));
+      } else if (d >= 0.69) {
+        if (c > 1 && c < 5) {
+          if (r > 0) p.push(-6 + (b ? 1 : -1));
+          p.push(b ? 1 : -1);
+          if (r < 5) p.push(6 + (b ? 1 : -1));
         }
       }
-      pick();
-    }
+
+      const pick = () => {
+        p = p.filter((pos) => {
+          const i = (s + pos) % shuffled.length;
+          return !RESTRICTED_STUDENT.find((s) => s.id === shuffled[i].id);
+        });
+
+        if (p.length) {
+          const i = (s + p[Math.floor(rand() * p.length)]) % shuffled.length;
+          swap(i, t);
+        }
+      };
+
+      if (p.length) {
+        pick();
+      } else {
+        for (let i = -2; i <= 2; i++) {
+          for (let j = -1; j <= 1; j++) {
+            if (c + i < 0 || c + i >= 6) continue;
+            if (r + j < 0 || r + j >= 6) continue;
+            if (!(Math.abs(i) === 2 || Math.abs(j) === 2)) continue;
+            p.push(6 * j + i);
+          }
+        }
+        pick();
+      }
+    })();
+
+    (() => {
+      let lkt, cyh;
+      do {
+        lkt = rcParser(shuffled.findIndex((s) => s.id === 16));
+        cyh = rcParser(shuffled.findIndex((s) => s.id === 18));
+
+        if (dist(lkt, cyh) > 1) break;
+        console.debug("OHNO");
+
+        if (lkt.r < 5) {
+          swap(lkt.id, lkt.id + 6);
+        } else if (lkt.c > 0) {
+          swap(lkt.id, lkt.id - 1);
+        } else if (cyh.r > 0) {
+          swap(cyh.id, cyh.id - 6);
+        } else if (cyh.c < 5) {
+          swap(cyh.id, cyh.id + 1);
+        }
+      } while (dist(lkt, cyh) <= 1);
+    })();
   });
 }
 
