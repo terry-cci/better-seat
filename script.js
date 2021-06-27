@@ -183,15 +183,15 @@ function happy() {
       const d = rand();
       const { b, r, c } = rcParser(s);
       let p = [];
-      if (d >= 0.99) {
+      if (d >= 1) {
         p.push(b ? -1 : 1);
-      } else if (d >= 0.94) {
+      } else if (d >= 1) {
         if (r > 0) p.push(-6);
         if (r < 5) p.push(6);
-      } else if (d >= 0.84) {
+      } else if (d >= 1) {
         if (r > 0) p.push(-6 + (b ? -1 : 1));
         if (r < 5) p.push(6 + (b ? -1 : 1));
-      } else if (d >= 0.69) {
+      } else if (d >= 1) {
         if (c > 1 && c < 5) {
           if (r > 0) p.push(-6 + (b ? 1 : -1));
           p.push(b ? 1 : -1);
