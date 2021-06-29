@@ -1,33 +1,6 @@
 const rand = new Math.seedrandom(Date.now());
 
-const RESTRICTED_STUDENT = [
-  {
-    id: 15,
-    seats: [
-      1, 2, 3, 4, 7, 8, 9, 10, 13, 14, 15, 16, 19, 20, 21, 22, 25, 26, 27, 28,
-      31, 32, 33, 34,
-    ],
-  },
-  {
-    id: 16,
-    seats: [24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35],
-  },
-  {
-    id: 28,
-    seats: [35],
-  },
-  {
-    id: 30,
-    seats: [31, 32, 33, 34],
-  },
-  {
-    id: 33,
-    seats: [
-      7, 8, 9, 10, 13, 14, 15, 16, 19, 20, 21, 22, 25, 26, 27, 28, 31, 32, 33,
-      34,
-    ],
-  },
-];
+const RESTRICTED_STUDENT = [];
 
 let students;
 
@@ -78,6 +51,13 @@ function reset() {
     students.push(STUDENT_INFO[i]);
     STUDENT_INFO.splice(i, 1);
   }
+
+  const s = students.findIndex((s) => s.id === 33);
+  const t = students.findIndex((s) => s.id === 15);
+  const targetIdx = (s + 18 + Math.floor(3 * Math.random())) % students.length;
+  const target = students[targetIdx];
+  students[targetIdx] = students[t];
+  students[t] = target;
 }
 
 const $canvas = document.querySelector("#canvas");
@@ -86,9 +66,17 @@ const ctx = $canvas.getContext("2d");
 $canvas.width = 1100;
 $canvas.height = 720;
 
-let offset = 0;
+const FPS = 1.5;
 
-function draw(adjust) {
+let offset = 0;
+let lastDraw = Date.now();
+let lastTrans = Date.now();
+
+function draw(fixed) {
+  const now = Date.now();
+  const dt = now - lastDraw;
+  const transDt = now - lastTrans;
+
   const { width: w, height: h } = $canvas;
   const gap = 0.01 * w;
   const pad = 2 * gap;
@@ -111,8 +99,6 @@ function draw(adjust) {
     shuffled[j] = k;
   });
 
-  if (adjust) adjust(shuffled);
-
   shuffled.forEach((student, idx) => {
     const x = idx % 6;
     const y = Math.floor(idx / 6);
@@ -127,140 +113,81 @@ function draw(adjust) {
     ctx.fillRect(0, 0, sw, sh);
     ctx.restore();
 
+    ctx.restore();
+  });
+
+  shuffled.forEach((student, idx) => {
+    const x = idx % 6;
+    const y = Math.floor(idx / 6);
+
     ctx.save();
+    ctx.translate(x * (sw + gap) + Math.floor(x / 2) * bigGap, y * (sh + gap));
+
+    ctx.save();
+
+    if (!fixed)
+      ctx.translate(
+        -(transDt / (1000 / FPS)) * (sw + gap + (x % 2 === 0 ? bigGap : 0)),
+        0
+      );
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     ctx.translate(sw / 2, sh * (2 / 5));
 
-    ctx.font =
-      sh / 3 +
-      "px -apple-system, BlinkMacSystemFont, '맑은 고딕', 'Malgun Gothic', '微軟正黑體', 'Microsoft JhengHei', '微軟雅黑體', 'Microsoft YaHei', 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif";
-    ctx.fillStyle = "#111";
-    ctx.fillText(student.name.zh, 0, 0);
+    const drawName = () => {
+      ctx.save();
+      ctx.font =
+        sh / 3 +
+        "px -apple-system, BlinkMacSystemFont, '맑은 고딕', 'Malgun Gothic', '微軟正黑體', 'Microsoft JhengHei', '微軟雅黑體', 'Microsoft YaHei', 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif";
+      ctx.fillStyle = "#111";
+      ctx.fillText(student.name.zh, 0, 0);
 
-    ctx.translate(0, sh / 3);
-    ctx.font =
-      sh / 6 +
-      "px -apple-system, BlinkMacSystemFont, '맑은 고딕', 'Malgun Gothic', '微軟正黑體', 'Microsoft JhengHei', '微軟雅黑體', 'Microsoft YaHei', 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif";
-    ctx.fillStyle = "#888";
-    ctx.fillText(student.name.en + " (" + student.id + ")", 0, 0);
+      ctx.translate(0, sh / 3);
+      ctx.font =
+        sh / 6 +
+        "px -apple-system, BlinkMacSystemFont, '맑은 고딕', 'Malgun Gothic', '微軟正黑體', 'Microsoft JhengHei', '微軟雅黑體', 'Microsoft YaHei', 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif";
+      ctx.fillStyle = "#888";
+      ctx.fillText(student.name.en + " (" + student.id + ")", 0, 0);
+      ctx.restore();
+    };
+
+    drawName();
+    if (x === 0) {
+      ctx.save();
+
+      ctx.translate(6 * (sw + gap) + 3 * bigGap, -sh - gap);
+      if (y === 0) ctx.translate(0, (sh + gap) * 6);
+      drawName();
+
+      ctx.restore();
+    }
     ctx.restore();
 
     ctx.restore();
   });
 
   ctx.restore();
-  offset = ++offset % shuffled.length;
-}
+  if (transDt >= 1000 / FPS) {
+    offset = ++offset % shuffled.length;
+    lastTrans = now;
+  }
 
-reset();
-
-const FPS = 20;
-let timer = setInterval(draw, 1000 / FPS);
-
-draw();
-
-function happy() {
-  draw((shuffled) => {
-    const rcParser = (id) => ({
-      id,
-      b: id % 2,
-      r: Math.floor(id / 6),
-      c: id % 6,
-    });
-
-    const dist = (a, b) => Math.max(Math.abs(a.r - b.r), Math.abs(a.c - b.c));
-
-    const swap = (a, b) => {
-      const k = shuffled[a];
-      shuffled[a] = shuffled[b];
-      shuffled[b] = k;
-    };
-
-    (() => {
-      const t = shuffled.findIndex((s) => s.id === 15);
-      const s = shuffled.findIndex((s) => s.id === 33);
-      const d = rand();
-      const { b, r, c } = rcParser(s);
-      let p = [];
-      if (d >= 1) {
-        p.push(b ? -1 : 1);
-      } else if (d >= 1) {
-        if (r > 0) p.push(-6);
-        if (r < 5) p.push(6);
-      } else if (d >= 1) {
-        if (r > 0) p.push(-6 + (b ? -1 : 1));
-        if (r < 5) p.push(6 + (b ? -1 : 1));
-      } else if (d >= 1) {
-        if (c > 1 && c < 5) {
-          if (r > 0) p.push(-6 + (b ? 1 : -1));
-          p.push(b ? 1 : -1);
-          if (r < 5) p.push(6 + (b ? 1 : -1));
-        }
-      }
-
-      const pick = () => {
-        p = p.filter((pos) => {
-          const i = (s + pos) % shuffled.length;
-          return !RESTRICTED_STUDENT.find((s) => s.id === shuffled[i].id);
-        });
-
-        if (p.length) {
-          const i = (s + p[Math.floor(rand() * p.length)]) % shuffled.length;
-          swap(i, t);
-        }
-      };
-
-      if (p.length) {
-        pick();
-      } else {
-        for (let i = -2; i <= 2; i++) {
-          for (let j = -1; j <= 1; j++) {
-            if (c + i < 0 || c + i >= 6) continue;
-            if (r + j < 0 || r + j >= 6) continue;
-            if (!(Math.abs(i) === 2 || Math.abs(j) === 2)) continue;
-            p.push(6 * j + i);
-          }
-        }
-        pick();
-      }
-    })();
-
-    (() => {
-      let lkt, cyh;
-      do {
-        lkt = rcParser(shuffled.findIndex((s) => s.id === 16));
-        cyh = rcParser(shuffled.findIndex((s) => s.id === 18));
-
-        if (dist(lkt, cyh) > 1) break;
-        console.debug("OHNO");
-
-        if (lkt.r < 5) {
-          swap(lkt.id, lkt.id + 6);
-        } else if (lkt.c > 0) {
-          swap(lkt.id, lkt.id - 1);
-        } else if (cyh.r > 0) {
-          swap(cyh.id, cyh.id - 6);
-        } else if (cyh.c < 5) {
-          swap(cyh.id, cyh.id + 1);
-        }
-      } while (dist(lkt, cyh) <= 1);
-    })();
+  lastDraw = now;
+  requestAnimationFrame(() => {
+    draw();
   });
 }
 
+reset();
+draw();
+
 function snapshot() {
-  clearInterval(timer);
-
-  happy();
-
+  draw(true);
   const imgLink = document.createElement("a");
   imgLink.download =
     "better_seat." + new Date().toISOString().substr(0, 10) + ".png";
   imgLink.href = $canvas.toDataURL();
   imgLink.click();
-
-  timer = setInterval(draw, 1000 / FPS);
 }
 
 function lucky() {
@@ -272,5 +199,5 @@ function lucky() {
   setTimeout(() => {
     document.querySelector("#reset-cat").classList.remove("slide");
     document.querySelector("#reset-btn").disabled = false;
-  }, 1000);
+  }, 500);
 }

@@ -59,7 +59,7 @@ body {
   left: -100vw;
 }
 #reset-cat.slide {
-  animation: 1s linear slide-by forwards;
+  animation: 0.5s linear slide-by forwards;
 }
 
 @keyframes slide-by {
